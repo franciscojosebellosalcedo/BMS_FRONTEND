@@ -55,6 +55,7 @@ const TableRols = () => {
         } catch (error) {
             
         }
+        
     }
 
     const initChangeStatus = ( rol: TRol ) =>{
