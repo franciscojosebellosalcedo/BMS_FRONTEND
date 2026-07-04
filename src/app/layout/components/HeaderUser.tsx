@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { useAppDispatch } from "../../store/hooks";
-import { logout } from "../../../features/auth/auth-slice";
+import { logout } from "../../../features/auth/authSlice";
 
 type Props = {
     setShowUserMenu: (open: boolean) => void
@@ -22,12 +22,12 @@ const HeaderUser: FC<Props> = ({
         <>
             <div
                 className="position-fixed top-0 start-0 w-100 h-100"
-                style={{ zIndex: 1060 }}
+                style={{ zIndex: 1090 }}
                 onClick={() => setShowUserMenu(false)}
             />
             <div
                 className="position-absolute end-0 mt-2 bg-body rounded-3 shadow-lg border py-2"
-                style={{ width: '200px', zIndex: 1060 }}
+                style={{ width: '200px', zIndex: 1090 }}
             >
                 <a href="/perfil" className="dropdown-item d-flex align-items-center gap-2 px-3 py-2">
                     <i className="bi bi-person"></i>

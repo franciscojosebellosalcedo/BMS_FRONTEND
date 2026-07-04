@@ -1,9 +1,9 @@
 import { store } from "../../app/store/store";
-import { TEXT_REFRESS_TOKEN } from "../../constants/auth-constant";
-import { login, logout } from "../../features/auth/auth-slice";
-import { getItemLocalStorage, setItemLocalStorage } from "../../shared/utils/localStorage-utils";
-import { authApi } from "./authApi";
-import type { TLoginResponse } from "./types";
+import { TEXT_REFRESS_TOKEN } from "../../constants/authConstant";
+import { login, logout } from "../../features/auth/authSlice";
+import { getItemLocalStorage, setItemLocalStorage } from "../../shared/utils/localStorageUtils";
+import { authApi } from "./api/authApi";
+import type { TLoginResponse } from "./types/authType";
 
 export const boostrapAuth = async () =>{
 

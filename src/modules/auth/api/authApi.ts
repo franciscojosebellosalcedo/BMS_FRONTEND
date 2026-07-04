@@ -1,13 +1,13 @@
-import { BaseApi } from "../../shared/services/baseApi";
+import { BaseApi } from "../../../shared/services/baseApi";
 
 import type {
     TResponseHttp
-} from "../../shared/types";
+} from "../../../shared/types/responseType";
 
 import type {
     TLogin,
     TLoginResponse
-} from "./types";
+} from "../types/authType";
 
 class AuthApi extends BaseApi {
 

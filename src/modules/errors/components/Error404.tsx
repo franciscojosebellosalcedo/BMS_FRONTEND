@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { appConfig } from "../../../app/app-config"
+import { appConfig } from "../../../app/app.config"
 
 const Error404 = () => {
 

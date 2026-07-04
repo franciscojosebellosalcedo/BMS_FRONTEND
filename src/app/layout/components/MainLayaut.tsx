@@ -40,7 +40,10 @@ export function MainLayout() {
                     isSidebarCollapsed={isSidebarCollapsed}
                     isMobile={isMobile}
                 />
-                <SubHeader/>
+                <SubHeader
+                    isMobile = { isMobile }
+                    isSidebarCollapsed={isSidebarCollapsed}
+                />
                 <main
                     style={{
                         marginLeft: isMobile ? '70px' : (isSidebarCollapsed ? '80px' : '260px'),

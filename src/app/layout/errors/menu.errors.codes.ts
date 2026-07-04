@@ -1,0 +1,4 @@
+export const MENU_RESPONSE_CODES = {
+    MENU_SUCCESS: "MENU_SUCCESS",
+    MENU_ERROR: "MENU_ERROR"
+}

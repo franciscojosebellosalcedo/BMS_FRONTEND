@@ -1,5 +1,3 @@
-import type { TRol } from "../settings/roles/types";
-
 export type TUser = {
     usua_Id?: number;
     usua_Nombre: string;
@@ -11,16 +9,4 @@ export type TUser = {
     usua_Modificacion?: Date
     usua_CreacionId?: number
     usua_ModificacionId?: number
-}
-
-export type TLogin = {
-    usua_NombreUsuario: string;
-    usua_Contrasenia: string
-}
-
-export type TLoginResponse = {
-    user: TUser;
-    rol: TRol;
-    refressToken: string;
-    accessToken: string;
 }

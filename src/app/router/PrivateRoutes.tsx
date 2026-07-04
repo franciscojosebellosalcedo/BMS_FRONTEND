@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
-import type { TUser } from "../../modules/auth/types";
 import { useAppSelector } from "../store/hooks";
+import type { TUser } from "../../modules/auth/types/userType";
 
 const PrivateRoutes = () => {
 

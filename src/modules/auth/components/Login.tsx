@@ -3,19 +3,19 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import * as Yup from "yup";
-import { appConfig } from "../../../app/app-config";
+import { appConfig } from "../../../app/app.config";
 import { useTheme } from "../../../app/providers/ThemeProvider";
 import { useAppDispatch } from "../../../app/store/hooks";
-import { TEXT_REFRESS_TOKEN } from "../../../constants/auth-constant";
-import { login } from "../../../features/auth/auth-slice";
-import ErrorInput from "../../../shared/components/ErrorInput";
+import { TEXT_REFRESS_TOKEN } from "../../../constants/authConstant";
+import { login } from "../../../features/auth/authSlice";
 import LabelInput from "../../../shared/components/LabelInput";
-import LoaderSubmit from "../../../shared/components/LoaderSubmit";
+import { getMessageResponse } from "../../../shared/responseMessage/getMessageResponse";
 import { useAntiSpam } from "../../../shared/hooks/useAntiSpam";
-import { setItemLocalStorage } from "../../../shared/utils/localStorage-utils";
-import { authApi } from "../authApi";
-import type { TLogin, TLoginResponse } from "../types";
-import { getErrorMessage } from "../../../shared/errors/getErrorMessage";
+import { setItemLocalStorage } from "../../../shared/utils/localStorageUtils";
+import { authApi } from "../api/authApi";
+import type { TLogin, TLoginResponse } from "../types/authType";
+import TextError from "../../../shared/components/TextError";
+import Loading from "../../../shared/components/Loader";
 
 const initialValues: TLogin = {
     usua_NombreUsuario: "",
@@ -55,8 +55,7 @@ export default function LoginPage() {
 
             const responseHttp = await authApi.login(values);
             const dataResponse: TLoginResponse = responseHttp.data;
-            console.log(dataResponse);
-            
+
             if (responseHttp.ok) {
 
                 dispatch(login(dataResponse));
@@ -68,11 +67,11 @@ export default function LoginPage() {
         } catch (error: any) {
 
             const code = error?.response?.data?.code;
-            const message = getErrorMessage(code);
+            const message = getMessageResponse(code);
 
             setError(message);
 
-        }finally{
+        } finally {
 
             setIsLoading(false);
 
@@ -190,7 +189,7 @@ export default function LoginPage() {
                             </InputGroup>
                             {
                                 formik.touched.usua_NombreUsuario && formik.errors.usua_NombreUsuario &&
-                                <ErrorInput message={formik.errors.usua_NombreUsuario} />
+                                <TextError message={formik.errors.usua_NombreUsuario} />
 
                             }
                         </div>
@@ -226,7 +225,7 @@ export default function LoginPage() {
                             </InputGroup>
                             {
                                 formik.touched.usua_Contrasenia && formik.errors.usua_Contrasenia &&
-                                <ErrorInput message={formik.errors.usua_Contrasenia} />
+                                <TextError message={formik.errors.usua_Contrasenia} />
                             }
                         </div>
 
@@ -248,7 +247,7 @@ export default function LoginPage() {
                             }}
                         >
                             {isLoading ? (
-                                <LoaderSubmit />
+                                <Loading />
                             ) : (
                                 <span className="d-flex align-items-center justify-content-center gap-2">
                                     <i className="bi bi-box-arrow-in-right"></i>

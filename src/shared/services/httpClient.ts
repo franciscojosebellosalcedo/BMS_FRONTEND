@@ -4,9 +4,9 @@ import axios, {
 } from "axios"
 
 import { store } from "../../app/store/store"
-import { logout } from "../../features/auth/auth-slice"
+import { logout } from "../../features/auth/authSlice"
 
-import type { TResponseHttp } from "../types"
+import type { TResponseHttp } from "../types/responseType"
 
 export class HttpClient {
 

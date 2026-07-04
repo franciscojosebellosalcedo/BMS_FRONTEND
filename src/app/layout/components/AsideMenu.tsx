@@ -1,240 +1,15 @@
 
 import { useEffect, useState } from "react"
-import { getNamesUser } from "../../../shared/utils/userUtils"
-import { appConfig } from "../../app-config"
+import { Link, useNavigate } from "react-router-dom"
 import { getNameRolCurrentUser } from "../../../shared/utils/rolUtils"
-
-interface SubMenuOption {
-    label: string
-    href: string
-}
-
-interface SubModule {
-    label: string
-    icon: string
-    options: SubMenuOption[]
-}
-
-interface MenuItem {
-    id: string
-    label: string
-    icon: string
-    href?: string
-    subModules?: SubModule[]
-}
-
-const menuItems: MenuItem[] = [
-    {
-        id: "inicio",
-        label: "Inicio",
-        icon: "bi-house",
-        href: "/"
-    },
-    {
-        id: "ventas",
-        label: "Ventas",
-        icon: "bi-cart",
-        subModules: [
-            {
-                label: "Pedidos",
-                icon: "bi-bag",
-                options: [
-                    { label: "Nuevo pedido", href: "/ventas/pedidos/nuevo" },
-                    { label: "Lista de pedidos", href: "/ventas/pedidos/lista" },
-                    { label: "Pendientes", href: "/ventas/pedidos/pendientes" },
-                    { label: "Completados", href: "/ventas/pedidos/completados" }
-                ]
-            },
-            {
-                label: "Cotizaciones",
-                icon: "bi-file-text",
-                options: [
-                    { label: "Nueva cotizacion", href: "/ventas/cotizaciones/nueva" },
-                    { label: "Historial", href: "/ventas/cotizaciones/historial" },
-                    { label: "Plantillas", href: "/ventas/cotizaciones/plantillas" }
-                ]
-            },
-            {
-                label: "Devoluciones",
-                icon: "bi-arrow-return-left",
-                options: [
-                    { label: "Registrar devolucion", href: "/ventas/devoluciones/nueva" },
-                    { label: "Historial", href: "/ventas/devoluciones/historial" }
-                ]
-            }
-        ]
-    },
-    {
-        id: "inventario",
-        label: "Inventario",
-        icon: "bi-box-seam",
-        subModules: [
-            {
-                label: "Productos",
-                icon: "bi-boxes",
-                options: [
-                    { label: "Catalogo", href: "/inventario/productos/catalogo" },
-                    { label: "Agregar producto", href: "/inventario/productos/nuevo" },
-                    { label: "Categorias", href: "/inventario/productos/categorias" }
-                ]
-            },
-            {
-                label: "Movimientos",
-                icon: "bi-arrow-left-right",
-                options: [
-                    { label: "Entradas", href: "/inventario/movimientos/entradas" },
-                    { label: "Salidas", href: "/inventario/movimientos/salidas" },
-                    { label: "Transferencias", href: "/inventario/movimientos/transferencias" }
-                ]
-            },
-            {
-                label: "Almacenes",
-                icon: "bi-building",
-                options: [
-                    { label: "Lista de almacenes", href: "/inventario/almacenes/lista" },
-                    { label: "Nuevo almacen", href: "/inventario/almacenes/nuevo" }
-                ]
-            }
-        ]
-    },
-    {
-        id: "eventos",
-        label: "Eventos",
-        icon: "bi-calendar-event",
-        subModules: [
-            {
-                label: "Calendario",
-                icon: "bi-calendar3",
-                options: [
-                    { label: "Ver calendario", href: "/eventos/calendario" },
-                    { label: "Nuevo evento", href: "/eventos/calendario/nuevo" }
-                ]
-            },
-            {
-                label: "Reservaciones",
-                icon: "bi-bookmark",
-                options: [
-                    { label: "Activas", href: "/eventos/reservaciones/activas" },
-                    { label: "Historial", href: "/eventos/reservaciones/historial" },
-                    { label: "Nueva reservacion", href: "/eventos/reservaciones/nueva" }
-                ]
-            },
-            {
-                label: "Servicios",
-                icon: "bi-gear",
-                options: [
-                    { label: "Lista de servicios", href: "/eventos/servicios/lista" },
-                    { label: "Paquetes", href: "/eventos/servicios/paquetes" }
-                ]
-            }
-        ]
-    },
-    {
-        id: "clientes",
-        label: "Clientes",
-        icon: "bi-people",
-        subModules: [
-            {
-                label: "Directorio",
-                icon: "bi-person-lines-fill",
-                options: [
-                    { label: "Todos los clientes", href: "/clientes/directorio" },
-                    { label: "Nuevo cliente", href: "/clientes/directorio/nuevo" },
-                    { label: "Importar", href: "/clientes/directorio/importar" }
-                ]
-            },
-            {
-                label: "Segmentos",
-                icon: "bi-diagram-3",
-                options: [
-                    { label: "Ver segmentos", href: "/clientes/segmentos" },
-                    { label: "Crear segmento", href: "/clientes/segmentos/nuevo" }
-                ]
-            }
-        ]
-    },
-    {
-        id: "reportes",
-        label: "Reportes",
-        icon: "bi-bar-chart",
-        subModules: [
-            {
-                label: "Ventas",
-                icon: "bi-graph-up",
-                options: [
-                    { label: "Resumen diario", href: "/reportes/ventas/diario" },
-                    { label: "Resumen mensual", href: "/reportes/ventas/mensual" },
-                    { label: "Por producto", href: "/reportes/ventas/producto" }
-                ]
-            },
-            {
-                label: "Inventario",
-                icon: "bi-clipboard-data",
-                options: [
-                    { label: "Stock actual", href: "/reportes/inventario/stock" },
-                    { label: "Movimientos", href: "/reportes/inventario/movimientos" }
-                ]
-            },
-            {
-                label: "Financiero",
-                icon: "bi-cash-stack",
-                options: [
-                    { label: "Ingresos", href: "/reportes/financiero/ingresos" },
-                    { label: "Gastos", href: "/reportes/financiero/gastos" },
-                    { label: "Balance", href: "/reportes/financiero/balance" }
-                ]
-            }
-        ]
-    },
-    {
-        id: "facturacion",
-        label: "Facturacion",
-        icon: "bi-receipt",
-        subModules: [
-            {
-                label: "Facturas",
-                icon: "bi-file-earmark-text",
-                options: [
-                    { label: "Emitir factura", href: "/facturacion/facturas/nueva" },
-                    { label: "Historial", href: "/facturacion/facturas/historial" },
-                    { label: "Borradores", href: "/facturacion/facturas/borradores" }
-                ]
-            },
-            {
-                label: "Notas de credito",
-                icon: "bi-file-earmark-minus",
-                options: [
-                    { label: "Emitir nota", href: "/facturacion/notas/nueva" },
-                    { label: "Historial", href: "/facturacion/notas/historial" }
-                ]
-            }
-        ]
-    },
-    {
-        id: "configuracion",
-        label: "Configuracion",
-        icon: "bi-gear",
-        subModules: [
-            {
-                label: "General",
-                icon: "bi-sliders",
-                options: [
-                    { label: "Empresa", href: "/configuracion/general/empresa" },
-                    { label: "Preferencias", href: "/configuracion/general/preferencias" }
-                ]
-            },
-            {
-                label: "Usuarios",
-                icon: "bi-person-gear",
-                options: [
-                    { label: "Lista de usuarios", href: "/configuracion/usuarios/lista" },
-                    { label: "Roles y permisos", href: "/configuracion/usuarios/roles" },
-                    { label: "Nuevo usuario", href: "/configuracion/usuarios/nuevo" }
-                ]
-            }
-        ]
-    }
-]
+import { getNamesUser } from "../../../shared/utils/userUtils"
+import { appConfig } from "../../app.config"
+import type { TMenu, TModule, TOption, TSubmodule, TSubModuleItem } from "../types/menu.type"
+import { ICONS_MODULE, ICONS_SUBMODULES } from "../utils/menu.icon.util"
+import { MODULES_CODES, sortMenu } from "../utils/menu.util"
+import { useAppSelector } from "../../store/hooks"
+import { ENTITY_ROUTES } from "../../utils/menu/entitiesRoutes"
+import { MODULE_ROUTES } from "../../utils/menu/moduleRoutes"
 
 interface SidebarProps {
     isCollapsed: boolean
@@ -243,9 +18,15 @@ interface SidebarProps {
 
 const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
 
-    const [activeMenu, setActiveMenu] = useState<string | null>(null)
-    const [activeSubModule, setActiveSubModule] = useState<string | null>(null)
-    const [isDarkMode, setIsDarkMode] = useState(false)
+    const [activeMenu, setActiveMenu] = useState<number | null>(null)
+
+    const [activeSubModule, setActiveSubModule] = useState<number | null>(null)
+
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    const navigate = useNavigate();
+
+    const menu = useAppSelector(state => state.layout.menu );
 
     useEffect(() => {
         const checkTheme = () => {
@@ -262,29 +43,55 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
         })
 
         return () => observer.disconnect()
-    }, [])
+    }, []);
 
     const collapsed = isMobile ? true : isCollapsed
 
     const sidebarBg = isDarkMode ? "#1a2332" : "#212529"
     const sidebarBorderColor = isDarkMode ? "#2d3a4f" : "#495057"
 
-    const handleMenuClick = (item: MenuItem) => {
-        if (item.href) {
+    const getPathOption = (option: TOption, codeModule: string) => {
+
+        const path = `${MODULE_ROUTES[ codeModule as keyof typeof MODULE_ROUTES]}/page/${ENTITY_ROUTES[option.opci_Slug as keyof typeof ENTITY_ROUTES]}`;
+        return path;
+
+    }
+
+    const handleMenuClick = (item: TModule) => {
+
+        if (activeMenu === item.modulo_Id) {
+
             setActiveMenu(null)
             setActiveSubModule(null)
-            return
-        }
-        if (activeMenu === item.id) {
-            setActiveMenu(null)
-            setActiveSubModule(null)
+
         } else {
-            setActiveMenu(item.id)
+
+            setActiveMenu(item.modulo_Id)
             setActiveSubModule(null)
         }
     }
 
-    const handleSubModuleClick = (subModuleLabel: string) => {
+    const getIconModule = (module: TModule) => {
+        return ICONS_MODULE[module.modulo_Codigo as keyof typeof ICONS_MODULE]
+    }
+
+    const getIconSubModule = (module: TSubmodule) => {
+        return ICONS_SUBMODULES[module.submo_Codigo as keyof typeof ICONS_SUBMODULES]
+    }
+
+    const getModulesActives = ( menu: TMenu[] ) =>{
+        return menu.filter((m) => m.module.modulo_Activo )
+    }
+
+    const getSubmodulesActives = (submodules: TSubModuleItem[] ) =>{
+        return submodules.filter((sub) => sub.submodule.submo_Activo )
+    }
+
+    const getOptionsActives = ( options: TOption[] ) =>{
+        return options.filter((opt) => opt.opci_Activo )
+    }
+
+    const handleSubModuleClick = (subModuleLabel: number) => {
         if (activeSubModule === subModuleLabel) {
             setActiveSubModule(null)
         } else {
@@ -292,11 +99,10 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
         }
     }
 
-    const activeItem = menuItems.find(item => item.id === activeMenu)
+    const activeItem = menu.find(item => item.module.modulo_Id === activeMenu)
 
     return (
         <>
-            {/* Sidebar */}
             <div
                 className="d-flex flex-column text-white position-fixed h-100"
                 style={{
@@ -306,7 +112,6 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                     backgroundColor: sidebarBg
                 }}
             >
-                {/* Logo */}
                 <div
                     className="d-flex align-items-center justify-content-center  py-2 border-bottom"
                     style={{ borderColor: `${sidebarBorderColor} !important` }}
@@ -328,39 +133,48 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                     )}
                 </div>
 
-                {/* Menu Items */}
                 <nav className="flex-grow-1 overflow-auto py-2">
                     <ul className="nav flex-column">
-                        {menuItems.map((item) => (
-                            <li key={item.id} className="nav-item">
+                        {sortMenu( getModulesActives(menu) ).map((item) => (
+                            <li key={item.module.modulo_Id} className="nav-item">
                                 <button
-                                    onClick={() => handleMenuClick(item)}
-                                    className={`nav-link text-white d-flex align-items-center justify-content-center w-100 border-0 bg-transparent px-2 py-2 ${activeMenu === item.id ? 'bg-primary bg-opacity-25' : ''
+                                    onClick={() => {
+                                        if (item.module.modulo_Codigo !== MODULES_CODES.INICIO) {
+
+                                            handleMenuClick(item.module);
+
+                                        } else {
+
+                                            navigate("/page/dashboard");
+
+                                        }
+                                    }}
+                                    className={`nav-link text-white d-flex align-items-center justify-content-center w-100 border-0 bg-transparent px-2 py-2 ${activeMenu === item.module.modulo_Id ? 'bg-primary bg-opacity-25' : ''
                                         }`}
                                     style={{
                                         cursor: 'pointer',
                                         transition: 'background-color 0.2s'
                                     }}
-                                    title={collapsed || isMobile ? item.label : undefined}
+                                    title={collapsed || isMobile ? item.module.modulo_Nombre : undefined}
                                     onMouseEnter={(e) => {
-                                        if (activeMenu !== item.id) {
+                                        if (activeMenu !== item.module.modulo_Id) {
                                             e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
                                         }
                                     }}
                                     onMouseLeave={(e) => {
-                                        if (activeMenu !== item.id) {
+                                        if (activeMenu !== item.module.modulo_Id) {
                                             e.currentTarget.style.backgroundColor = 'transparent'
                                         }
                                     }}
                                 >
-                                    <i className={`bi ${item.icon} fs-5`} style={{ width: '24px' }}></i>
+                                    <i className={`bi ${getIconModule(item.module)} fs-5`} style={{ width: '24px' }}></i>
                                     {!collapsed && !isMobile && (
                                         <>
-                                            <span className="ms-3 flex-grow-1 text-start">{item.label}</span>
-                                            {item.subModules && (
+                                            <span className="ms-3 flex-grow-1 text-start">{item.module.modulo_Nombre}</span>
+                                            {item.submodules.length && item.module.modulo_Codigo !== MODULES_CODES.INICIO && (
                                                 <i className={`bi bi-chevron-right small`} style={{
                                                     transition: 'transform 0.2s',
-                                                    transform: activeMenu === item.id ? 'rotate(90deg)' : 'rotate(0deg)'
+                                                    transform: activeMenu === item.module.modulo_Id ? 'rotate(90deg)' : 'rotate(0deg)'
                                                 }}></i>
                                             )}
                                         </>
@@ -371,7 +185,6 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                     </ul>
                 </nav>
 
-                {/* User Section */}
                 <div
                     className="border-top p-2"
                     style={{ borderColor: `${sidebarBorderColor} !important` }}
@@ -391,12 +204,11 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                         )}
                     </div>
                 </div>
+
             </div>
 
-            {/* Floating Submenu Panel */}
-            {activeMenu && activeItem?.subModules && (
+            {activeMenu && activeItem?.submodules && (
                 <>
-                    {/* Backdrop */}
                     <div
                         className="position-fixed top-0 start-0 w-100 h-100"
                         style={{
@@ -409,7 +221,6 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                         }}
                     />
 
-                    {/* Floating Panel */}
                     <div
                         className="position-fixed bg-body shadow-lg rounded-3 overflow-hidden border"
                         style={{
@@ -422,11 +233,10 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                             animation: 'slideIn 0.2s ease-out'
                         }}
                     >
-                        {/* Panel Header */}
                         <div className="d-flex align-items-center justify-content-between px-3 py-3 bg-body-secondary border-bottom">
                             <div className="d-flex align-items-center">
-                                <i className={`bi ${activeItem.icon} text-primary fs-5 me-2`}></i>
-                                <h6 className="mb-0 fw-semibold">{activeItem.label}</h6>
+                                <i className={`bi ${getIconModule(activeItem.module)} text-primary fs-5 me-2`}></i>
+                                <h6 className="mb-0 fw-semibold">{activeItem.module.modulo_Nombre}</h6>
                             </div>
                             <button
                                 className="btn btn-sm btn-light rounded-circle p-1"
@@ -440,36 +250,38 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                             </button>
                         </div>
 
-                        {/* SubModules */}
                         <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
-                            {activeItem.subModules.map((subModule) => (
-                                <div key={subModule.label} className="border-bottom">
+                            {getSubmodulesActives(activeItem.submodules).map((item) => (
+                                <div key={item.submodule.submo_Id} className="border-bottom">
                                     <button
-                                        onClick={() => handleSubModuleClick(subModule.label)}
+                                        onClick={() => handleSubModuleClick(item.submodule.submo_Id)}
                                         className="btn w-100 d-flex align-items-center justify-content-between px-3 py-2 rounded-0 border-0"
-                                        style={{ backgroundColor: activeSubModule === subModule.label ? 'var(--bs-secondary-bg)' : 'transparent' }}
+                                        style={{ backgroundColor: activeSubModule === item.submodule.submo_Id ? 'var(--bs-secondary-bg)' : 'transparent' }}
                                     >
                                         <div className="d-flex align-items-center">
-                                            <i className={`bi ${subModule.icon} text-secondary me-2`}></i>
-                                            <span className="fw-medium">{subModule.label}</span>
+                                            <i className={`bi ${getIconSubModule(item.submodule)} text-secondary me-2`}></i>
+                                            <span className="fw-medium">{item.submodule.submo_Nombre}</span>
                                         </div>
                                         <i className={`bi bi-chevron-down small text-secondary`} style={{
                                             transition: 'transform 0.2s',
-                                            transform: activeSubModule === subModule.label ? 'rotate(180deg)' : 'rotate(0deg)'
+                                            transform: activeSubModule === item.submodule.submo_Id ? 'rotate(180deg)' : 'rotate(0deg)'
                                         }}></i>
                                     </button>
 
-                                    {/* Options */}
                                     <div style={{
-                                        maxHeight: activeSubModule === subModule.label ? '300px' : '0',
+                                        maxHeight: activeSubModule === item.submodule.submo_Id ? '300px' : '0',
                                         overflow: 'hidden',
                                         transition: 'max-height 0.3s ease'
                                     }}>
                                         <div className="bg-body-tertiary">
-                                            {subModule.options.map((option) => (
-                                                <a
-                                                    key={option.href}
-                                                    href={option.href}
+                                            {getOptionsActives(item.options).map((option) => (
+                                                <Link
+                                                    onClick={() => {
+                                                        setActiveMenu(null)
+                                                        setActiveSubModule(null)
+                                                    }}
+                                                    key={option.opci_Id}
+                                                    to={getPathOption(option, activeItem.module.modulo_Codigo )}
                                                     className="d-flex align-items-center px-4 py-2 text-decoration-none text-body"
                                                     style={{
                                                         fontSize: '14px',
@@ -478,8 +290,8 @@ const AsideMenu = ({ isCollapsed, isMobile }: SidebarProps) => {
                                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bs-secondary-bg)'}
                                                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                                                 >
-                                                    <span className="border-start border-2 border-primary ps-3">{option.label}</span>
-                                                </a>
+                                                    <span className="border-start border-2 border-primary ps-3">{option.opci_Nombre}</span>
+                                                </Link>
                                             ))}
                                         </div>
                                     </div>

@@ -1,0 +1,31 @@
+import { BaseApi } from "../../../../shared/services/baseApi";
+import type { TPaginator } from "../../../../shared/types/paginatorType";
+import type { TResponseHttp } from "../../../../shared/types/responseType";
+import type { TRol } from "../types/rolType";
+
+class RolApi extends BaseApi {
+
+    constructor (){
+        super("/rols")
+    }
+
+    async create( values: TRol ): Promise<TResponseHttp<TRol>>{
+        return this.http.post( this.getUrl(), values);
+    }
+
+    async disable( id: number ): Promise<TResponseHttp<TRol>>{
+        return this.http.put(this.getUrl() + `/disable/${id}`);
+    }
+
+    async enable( id: number ): Promise<TResponseHttp<TRol>>{
+        return this.http.put(this.getUrl() + `/enable/${id}`);
+    }
+
+    async paginate( page: number, limit: number ): Promise<TResponseHttp<TPaginator>>{
+        return this.http.post( this.getUrl()+ `/paginate?page=${page}&limit=${limit}`);
+    }
+
+}
+
+const rolApi = new RolApi();
+export default rolApi

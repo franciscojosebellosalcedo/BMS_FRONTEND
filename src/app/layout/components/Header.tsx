@@ -27,13 +27,11 @@ const Header = ({ onToggleSidebar, isSidebarCollapsed, isMobile }: HeaderProps) 
                     zIndex: 1030
                 }}
             >
-                {/* Left Section */}
                 <div className="d-flex align-items-center gap-2 gap-md-3">
-                    {/* Solo mostrar boton de toggle en desktop */}
                     {!isMobile && (
                         <button
                             onClick={onToggleSidebar}
-                            className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                            className="btn rounded-circle d-flex align-items-center justify-content-center"
                             style={{ width: '40px', height: '40px' }}
                             title={isSidebarCollapsed ? "Expandir menu" : "Contraer menu"}
                         >
@@ -41,7 +39,6 @@ const Header = ({ onToggleSidebar, isSidebarCollapsed, isMobile }: HeaderProps) 
                         </button>
                     )}
 
-                    {/* Search */}
                     <div className="position-relative d-none d-md-block">
                         <i className="bi bi-search position-absolute text-secondary" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }}></i>
                         <input
@@ -53,9 +50,7 @@ const Header = ({ onToggleSidebar, isSidebarCollapsed, isMobile }: HeaderProps) 
                     </div>
                 </div>
 
-                {/* Right Section */}
                 <div className="d-flex align-items-center gap-2">
-                    {/* Theme Toggle */}
                     <button
                         onClick={toggleTheme}
                         className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
@@ -65,7 +60,6 @@ const Header = ({ onToggleSidebar, isSidebarCollapsed, isMobile }: HeaderProps) 
                         <i className={`bi ${theme === 'light' ? 'bi-moon-stars' : 'bi-sun'} fs-5`}></i>
                     </button>
 
-                    {/* Notifications Button */}
                     <button
                         onClick={() => setShowNotifications(true)}
                         className="btn btn-light rounded-circle d-flex align-items-center justify-content-center position-relative"
