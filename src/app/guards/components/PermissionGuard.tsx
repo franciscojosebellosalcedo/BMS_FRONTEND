@@ -1,14 +1,11 @@
 import type { FC, ReactNode } from "react"
-import type { TUserPermission } from "../../../modules/auth/types/userPermissionType"
 
 type Props = {
     entityName: string
-    permission: TUserPermission | null,
     children: ReactNode
 }
 
 const PermissionGuard: FC<Props> = ({
-    permission,
     entityName,
     children
 }) => {

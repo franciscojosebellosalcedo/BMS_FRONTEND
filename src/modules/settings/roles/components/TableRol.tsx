@@ -111,7 +111,7 @@ const TableRols = () => {
     }, [currentPage]);
 
     return (
-        <PermissionGuard entityName="Roles" permission={null}>
+        <PermissionGuard entityName="Roles">
 
             <div className="card shadow-sm border-0">
 
