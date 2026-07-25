@@ -1,3 +1,4 @@
+import type { TRolPermission } from "../../permissions/types/rolPermissiontype";
 
 export type TRol = {
     rol_Id?: number;
@@ -9,4 +10,9 @@ export type TRol = {
     rol_Modificacion?: Date;
     rol_CreacionId?: number;
     rol_ModificacionId?: number;
+}
+
+export type TDataRol = {
+    rol: TRol,
+    permissions: TRolPermission[]
 }

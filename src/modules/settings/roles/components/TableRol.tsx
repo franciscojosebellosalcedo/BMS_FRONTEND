@@ -16,6 +16,9 @@ import type { TRol } from "../types/rolType";
 import RolItem from "./RolItem";
 import PermissionGuard from "../../../../app/guards/components/PermissionGuard";
 import ConfirmAction from "../../../../shared/components/ConfirmAction";
+import { useAppDispatch, useAppSelector } from "../../../../app/store/hooks";
+import { setRolPaginated, updateRolById } from "../../../../features/rol/rolSlice";
+import IconAction from "../../../../shared/icons/components/IconAction";
 
 const TableRols = () => {
 
@@ -31,13 +34,15 @@ const TableRols = () => {
 
     const [totalRecords, setTotalRecords] = useState(0);
 
-    const [data, setData] = useState<TRol[]>([]);
-
     const [ rolSelected , setRolSelected ] = useState<TRol | null>( null );
 
     const [ isLoadingChangeStatus , setIsLoadingChangeStatus ] = useState( false );
 
     const [ isOpenConfirmChangeStatus, setIsOpenConfirmChangeStatus ] = useState( false );
+
+    const rols = useAppSelector(state => state.rols.data.paginated );
+
+    const dispatch = useAppDispatch();
 
     const onCloseConfirmChangeStatus = async () =>{
 
@@ -48,12 +53,40 @@ const TableRols = () => {
     // chenge status
     const changeStatus = async () =>{
 
-        try {
+        if( rolSelected ){
 
-            setIsLoadingChangeStatus( true )
-            
-        } catch (error) {
-            
+            try {
+    
+                setIsLoadingChangeStatus( true );
+    
+                const response: TResponseHttp<TRol> = await rolApi.changeStatus( rolSelected );
+
+                dispatch( updateRolById( response.data ) );
+
+                const code: string = response.code;
+
+                const message = getMessageResponse( code , { nameRol: response.data.rol_Nombre });
+
+                setRolSelected( null );
+
+                toast.success( message );
+                
+            } catch (error: any) {
+                
+                const code: string = error.response?.data?.code;
+    
+                const message = getMessageResponse( code );
+    
+                toast.error( message );
+    
+            }finally{
+
+                setIsLoadingChangeStatus( false );
+
+                setIsOpenConfirmChangeStatus( false );
+
+            }
+
         }
         
     }
@@ -77,7 +110,7 @@ const TableRols = () => {
 
             setTotalPages(dataResponse.totalPages);
             setCurrentPage(dataResponse.page);
-            setData(dataResponse.records);
+            dispatch( setRolPaginated( dataResponse.records) );
             setTotalRecords(dataResponse.totalRecords);
 
             setIsLoading(false);
@@ -166,7 +199,8 @@ const TableRols = () => {
                                 type="button"
                                 onClick={() => navigate(ROUTES.SETTING_NEW_ROL)}
                             >
-                                <i className="bi bi-plus-lg me-1"></i>
+                                <IconAction typeIcon="add" me={1} />
+
                                 Crear rol
                             </Button>
                         </div>
@@ -193,7 +227,7 @@ const TableRols = () => {
                                     </thead>
                                     <tbody>
                                         {
-                                            data.map((rol) => {
+                                            rols.map((rol) => {
                                                 return (
                                                     <RolItem
                                                         key={rol.rol_Id}

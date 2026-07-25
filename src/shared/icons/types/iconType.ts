@@ -1,0 +1,1 @@
+export type TTypeIcon = "add" | "notification" | "disable-enable"

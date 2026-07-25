@@ -1,6 +1,8 @@
-import type { FC } from "react";
+import { useEffect, type FC } from "react";
 import { Button, Modal } from "react-bootstrap";
 import Loading from "./Loader";
+import { handlerKeydown } from "../utils/handlerKeydown";
+import { useAntiSpam } from "../hooks/useAntiSpam";
 
 type Props = {
     isOpen: boolean;
@@ -19,6 +21,31 @@ const ConfirmAction: FC<Props> = ({
     onClose,
     isLoading
 }) => {
+
+    const { runWithLock } = useAntiSpam();
+
+    const onKeyDown = (e: KeyboardEvent) =>{
+
+        handlerKeydown(e , ()=>{
+
+            runWithLock(async ()=>{
+
+                await onConfirm();
+
+            });
+
+        } );
+    }
+
+    useEffect(()=>{
+
+        window.addEventListener("keydown", onKeyDown );
+
+        return ( )=>{
+            window.removeEventListener("keydown", onKeyDown );
+        }
+
+    },[ isOpen, isLoading ]);
 
     return (
         <Modal

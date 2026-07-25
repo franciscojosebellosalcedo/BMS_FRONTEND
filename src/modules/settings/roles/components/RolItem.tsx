@@ -4,6 +4,7 @@ import { formatDate } from "../../../../shared/utils/utils";
 import { Button } from "react-bootstrap";
 import React from "react";
 import { ROLES_CODE } from "../../../../constants/rolConstant";
+import IconAction from "../../../../shared/icons/components/IconAction";
 
 type Props = {
     rol: TRol;
@@ -44,10 +45,10 @@ const RolItem: FC<Props> = ({
                                 !initChangeStatus || rol.rol_Codigo === ROLES_CODE.ADMIN ? "" : 
 
                                     <Button
-                                        onClick={() => initChangeStatus(rol)}
+                                        onMouseDown={() => initChangeStatus(rol)}
                                         className='btn btn-icon btn-secondary btn-sm me-1'
                                     >
-                                        <i className="bi bi-toggle-on"></i>
+                                        <IconAction  typeIcon="disable-enable" />
                                     </Button>
                             }
 

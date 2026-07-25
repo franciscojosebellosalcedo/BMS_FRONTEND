@@ -1,7 +1,7 @@
 import { BaseApi } from "../../../../shared/services/baseApi";
 import type { TPaginator } from "../../../../shared/types/paginatorType";
 import type { TResponseHttp } from "../../../../shared/types/responseType";
-import type { TRol } from "../types/rolType";
+import type { TDataRol, TRol } from "../types/rolType";
 
 class RolApi extends BaseApi {
 
@@ -9,7 +9,7 @@ class RolApi extends BaseApi {
         super("/rols")
     }
 
-    async create( values: TRol ): Promise<TResponseHttp<TRol>>{
+    async create( values: TDataRol ): Promise<TResponseHttp<TDataRol>>{
         return this.http.post( this.getUrl(), values);
     }
 
@@ -19,6 +19,10 @@ class RolApi extends BaseApi {
 
     async enable( id: number ): Promise<TResponseHttp<TRol>>{
         return this.http.put(this.getUrl() + `/enable/${id}`);
+    }
+
+    async changeStatus( rol: TRol): Promise<TResponseHttp<TRol>>{
+        return this.http.put( `${this.getUrl()}/${rol.rol_Activo ? "disable" : "enable"}/${rol.rol_Id}` )
     }
 
     async paginate( page: number, limit: number ): Promise<TResponseHttp<TPaginator>>{

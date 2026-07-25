@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import Separator from "../../../../shared/components/Separator";
 import TitleContent from "../../../../shared/components/TitleContent";
-import type { TRol } from "../types/rolType";
+import type { TDataRol, TRol } from "../types/rolType";
 import * as Yup from "yup";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import clsx from "clsx";
@@ -17,6 +17,10 @@ import Loading from "../../../../shared/components/Loader";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../../app/utils/menu/appRoutes";
 import { useAntiSpam } from "../../../../shared/hooks/useAntiSpam";
+import { addRol } from "../../../../features/rol/rolSlice";
+import Permissions from "../../permissions/components/Permissions";
+import type { THandlerPermission } from "../../permissions/types/handlerType";
+import type { TRolPermission } from "../../permissions/types/rolPermissiontype";
 
 const initialValues: TRol = {
     rol_Nombre: "",
@@ -37,13 +41,101 @@ const FormRol = () => {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const dispatch = useAppDispatch();
-
     const navigate = useNavigate();
 
     const { runWithLock } = useAntiSpam();
 
-    const navigateTo = () => {
+    const dispatch = useAppDispatch();
+
+    const [permissions, setPermissions] = useState<TRolPermission[]>([]);
+
+    const handlePermissionRol = ({
+        optionId,
+        action,
+        value
+    }: THandlerPermission) => {
+
+        setPermissions(prev => {
+
+            const exist = prev.find(
+                permission => permission.perol_OpcionId === optionId
+            );
+
+            if (action === "access") {
+
+                if (value && !exist) {
+
+                    return [
+                        ...prev,
+                        {
+                            perol_OpcionId: optionId,
+                            perol_Crear: false,
+                            perol_Editar: false,
+                            perol_CambiarEstado: false
+                        }
+                    ];
+
+                }
+
+                if (!value) {
+
+                    return prev.filter(
+                        permission => permission.perol_OpcionId !== optionId
+                    );
+
+                }
+
+                return prev;
+            }
+
+            if (!exist) return prev;
+
+            if (action === "create") {
+
+                return prev.map(permission =>
+
+                    permission.perol_OpcionId === optionId
+                        ? {
+                            ...permission,
+                            perol_Crear: value
+                        }
+                        : permission
+
+                );
+
+            }
+
+            if (action === "edit") {
+
+                return prev.map(permission =>
+
+                    permission.perol_OpcionId === optionId
+                        ? {
+                            ...permission,
+                            perol_Editar: value
+                        }
+                        : permission
+
+                );
+
+            }
+
+            return prev.map(permission =>
+
+                permission.perol_OpcionId === optionId
+                    ? {
+                        ...permission,
+                        perol_CambiarEstado: value
+                    }
+                    : permission
+
+            );
+
+        });
+
+    };
+
+    const navigateToBack = () => {
         navigate(ROUTES.SETTING_ROLS)
     }
 
@@ -67,14 +159,22 @@ const FormRol = () => {
 
             setIsLoading(true);
 
-            const responseHttp: TResponseHttp<TRol> = await rolApi.create(values);
+            const responseHttp: TResponseHttp<TDataRol> = await rolApi.create({
+                rol: values,
+                permissions: permissions
+            });
+
             const data = responseHttp.data;
+
+            dispatch(addRol(data.rol));
 
             if (responseHttp.ok) {
 
-                const message = getMessageResponse(responseHttp.code, { nameRol: data.rol_Nombre });
+                const message = getMessageResponse(responseHttp.code, { nameRol: data.rol.rol_Nombre });
 
                 toast.success(message);
+
+                navigateToBack();
 
             }
 
@@ -87,18 +187,18 @@ const FormRol = () => {
 
             toast.error(message);
 
-        }finally{
-            
+        } finally {
+
             setIsLoading(false);
 
         }
 
     }
 
-    const handlerKeydown = (e: KeyboardEvent ) =>{
+    const handlerKeydown = (e: KeyboardEvent) => {
 
-        if( !isLoading && !e.repeat && e.key === "Enter"){
-            runWithLock( sendForm )
+        if (!isLoading && !e.repeat && e.key === "Enter") {
+            runWithLock(sendForm)
         }
 
     }
@@ -110,7 +210,7 @@ const FormRol = () => {
                     disabled={isLoading}
                     className="btn btn-sm btn-secondary me-2"
                     type="button"
-                    onClick={navigateTo}
+                    onClick={navigateToBack}
                 >
                     Cancelar
                 </Button>
@@ -128,19 +228,19 @@ const FormRol = () => {
             </div>
         ));
 
-    }, [isLoading]);
+    }, [isLoading, permissions]);
 
-    useEffect(()=>{
+    useEffect(() => {
 
-        window.addEventListener("keydown", handlerKeydown );
+        window.addEventListener("keydown", handlerKeydown);
 
-        return ()=>{
+        return () => {
 
-            window.removeEventListener("keydown", handlerKeydown );
+            window.removeEventListener("keydown", handlerKeydown);
 
         }
 
-    },[ isLoading ]);
+    }, [isLoading, permissions ]);
 
     return (
         <section>
@@ -156,10 +256,10 @@ const FormRol = () => {
                             <InputGroup.Text id='inputGroup-sizing-default'>Nombre</InputGroup.Text>
                             <Form.Control
                                 autoFocus
-                                onChange={(e)=>{
+                                onChange={(e) => {
 
                                     const value = e.target.value.trim();
-                                    formik.setFieldValue("rol_Nombre", value );
+                                    formik.setFieldValue("rol_Nombre", value);
 
                                 }}
                                 placeholder='Nombre del rol'
@@ -189,10 +289,10 @@ const FormRol = () => {
                             <Form.Control
                                 aria-label='Default'
                                 aria-describedby='inputGroup-sizing-default'
-                                onChange={(e)=>{
-                                    
+                                onChange={(e) => {
+
                                     const value = e.target.value.trim();
-                                    formik.setFieldValue("rol_Descripcion", value );
+                                    formik.setFieldValue("rol_Descripcion", value);
 
                                 }}
                                 placeholder='Descripción del rol'
@@ -219,12 +319,21 @@ const FormRol = () => {
 
             </>
 
-            <div className="d-flex justify-content-end">
+            <TitleContent title="Permisos" />
+
+            <Separator />
+
+            <Permissions
+                permissionsRol={permissions}
+                handlerPermissionRol={handlePermissionRol}
+            />
+
+            <div className="d-flex justify-content-end mt-2">
                 <Button
                     disabled={isLoading}
                     className="btn btn-sm btn-secondary me-2"
                     type="button"
-                    onClick={navigateTo}
+                    onClick={navigateToBack}
                 >
                     Cancelar
                 </Button>
