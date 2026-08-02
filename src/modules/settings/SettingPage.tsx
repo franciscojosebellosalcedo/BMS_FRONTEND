@@ -11,6 +11,8 @@ const SettingPage = () => {
 
             <Route path={`${ENTITY_ROUTES.SETTING_ROLS}/${ACTIONS_COMMON_ROUTES.CREATE}`} element={<FormRol/>} />
 
+            <Route path={`${ENTITY_ROUTES.SETTING_ROLS}/${ACTIONS_COMMON_ROUTES.UPDATE}/:id`} element={<FormRol/>} />
+
             <Route path='*' element={<Navigate to={ROUTES.ERROR_404} />} />
 
         </Routes>

@@ -17,7 +17,7 @@ export const ENTITY: Record< string , string> = {
 
 export const ACTION : Record<string, string> = {
     new: "Nuevo",
-    edit: "Editar",
+    update: "Editar",
 }
 
 export const LABELS = {

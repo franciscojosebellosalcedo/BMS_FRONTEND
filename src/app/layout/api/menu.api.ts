@@ -1,6 +1,6 @@
 import { BaseApi } from "../../../shared/services/baseApi";
 import type { TResponseHttp } from "../../../shared/types/responseType";
-import type { TMenu } from "../types/menu.type";
+import type { TMenu, TOption } from "../types/menu.type";
 
 class MenuApi extends BaseApi {
 
@@ -9,7 +9,11 @@ class MenuApi extends BaseApi {
     }
 
     async getMenu(): Promise<TResponseHttp<TMenu[]>>{
-        return await this.http.get( this.getUrl() )
+        return await this.http.get( this.getUrl() );
+    }
+
+    async getOptions(): Promise<TResponseHttp<TOption[]>> {
+        return await this.http.get( this.getUrl("/options") );
     }
     
 }

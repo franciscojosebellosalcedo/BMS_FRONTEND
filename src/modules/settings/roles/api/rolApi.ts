@@ -21,6 +21,10 @@ class RolApi extends BaseApi {
         return this.http.put(this.getUrl() + `/enable/${id}`);
     }
 
+    async getRolById( id: number ) : Promise<TResponseHttp<TDataRol>>{
+        return this.http.get( this.getUrl() + `/${id}`);
+    }
+
     async changeStatus( rol: TRol): Promise<TResponseHttp<TRol>>{
         return this.http.put( `${this.getUrl()}/${rol.rol_Activo ? "disable" : "enable"}/${rol.rol_Id}` )
     }

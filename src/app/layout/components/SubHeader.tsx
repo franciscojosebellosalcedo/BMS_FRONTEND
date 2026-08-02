@@ -1,8 +1,7 @@
 import { useMemo, type FC } from "react";
 import { useLocation } from "react-router-dom";
-import { LABELS } from "../utils/label.breadcrumb";
 import { useAppSelector } from "../../store/hooks";
-import { ROUTES } from "../../utils/menu/appRoutes";
+import { LABELS } from "../utils/label.breadcrumb";
 
 type Props = {
     isSidebarCollapsed: boolean,
@@ -17,8 +16,6 @@ const SubHeader: FC<Props> = ({
     const { pathname } = useLocation();
 
     const componentReactNode = useAppSelector(state => state.layout.component );
-
-    const location = useLocation();
 
     const getBreadcrumb = ( ) =>{
 
@@ -50,18 +47,6 @@ const SubHeader: FC<Props> = ({
 
     }, [pathname]);
 
-    const showComponent = () =>{
-
-        const pathname = location.pathname;
-        
-        if(
-            pathname.includes( ROUTES.SETTING_NEW_ROL)
-        ){
-            return componentReactNode
-        }
-        
-    }
-
     return (
         <header
             className="bg-body border-bottom shadow-sm position-sticky top-0 d-flex align-items-center justify-content-between px-3 px-md-4"
@@ -76,7 +61,7 @@ const SubHeader: FC<Props> = ({
                 {breadcrumb}
             </span>
 
-            {showComponent()}
+            {componentReactNode}
             
         </header>
     );

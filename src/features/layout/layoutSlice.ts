@@ -1,21 +1,27 @@
 import type { ReactNode } from "react";
-import type { TMenu } from "../../app/layout/types/menu.type";
+import type { TMenu, TOption } from "../../app/layout/types/menu.type";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface LayoutState {
-    menu: TMenu[],
-    component: ReactNode | null
+    menu: TMenu[];
+    options: TOption[];
+    component: ReactNode | null;
 }
 
 const initialState: LayoutState = {
     component: null,
-    menu: []
+    menu: [],
+    options: []
 }
 
 const layoutSlice = createSlice({
     name: "layout",
     initialState,
     reducers: {
+
+        setOptionsMenu: (state, action: PayloadAction<TOption[]> ) =>{
+            state.options = action.payload;
+        },
 
         setMenu: (state, action: PayloadAction<TMenu[]> ) =>{
             state.menu = action.payload;
@@ -28,5 +34,5 @@ const layoutSlice = createSlice({
     }
 });
 
-export const { setMenu , setComponent} = layoutSlice.actions;
+export const { setMenu , setComponent, setOptionsMenu } = layoutSlice.actions;
 export default layoutSlice.reducer;

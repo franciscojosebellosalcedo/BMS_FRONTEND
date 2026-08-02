@@ -1,10 +1,12 @@
 import type { FC } from "react";
 import type { TRol } from "../types/rolType";
-import { formatDate } from "../../../../shared/utils/utils";
+import { formatDate } from "../../../../shared/utils/commonUtils";
 import { Button } from "react-bootstrap";
 import React from "react";
 import { ROLES_CODE } from "../../../../constants/rolConstant";
 import IconAction from "../../../../shared/icons/components/IconAction";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../../../app/utils/menu/appRoutes";
 
 type Props = {
     rol: TRol;
@@ -17,6 +19,9 @@ const RolItem: FC<Props> = ({
     initChangeStatus,
     readOnly
 }) => {
+
+    const navigate = useNavigate();
+
     return (
         <tr>
             <td>
@@ -42,13 +47,34 @@ const RolItem: FC<Props> = ({
                         <React.Fragment>
 
                             {
-                                !initChangeStatus || rol.rol_Codigo === ROLES_CODE.ADMIN ? "" : 
+                                !initChangeStatus || rol.rol_Codigo === ROLES_CODE.ADMIN ? "" :
 
                                     <Button
+                                        title="Habilitar/Deshabilitar"
                                         onMouseDown={() => initChangeStatus(rol)}
                                         className='btn btn-icon btn-secondary btn-sm me-1'
                                     >
-                                        <IconAction  typeIcon="disable-enable" />
+                                        <IconAction typeIcon="disable-enable" />
+                                    </Button>
+                            }
+
+                            {
+                                !initChangeStatus || rol.rol_Codigo === ROLES_CODE.ADMIN ? "" :
+
+                                    <Button
+                                        title="Editar"
+                                        onMouseDown={() => {
+
+                                            if( rol?.rol_Id ){
+
+                                                navigate(ROUTES.SETTING_UPDATE_ROL(rol.rol_Id));
+
+                                            }
+
+                                        }}
+                                        className='btn btn-icon btn-secondary btn-sm me-1'
+                                    >
+                                        <IconAction typeIcon="edit" />
                                     </Button>
                             }
 

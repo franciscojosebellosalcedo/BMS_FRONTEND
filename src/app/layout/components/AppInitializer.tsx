@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { setMenu } from "../../../features/layout/layoutSlice";
+import { setMenu, setOptionsMenu } from "../../../features/layout/layoutSlice";
 import { useAppDispatch } from "../../store/hooks";
 import { menuApi } from "../api/menu.api";
-import type { TMenu } from "../types/menu.type";
+import type { TMenu, TOption } from "../types/menu.type";
 
 const AppInitializer = () => {
 
@@ -14,17 +14,23 @@ const AppInitializer = () => {
         return response.data;
     }
 
+    const getOptionsMenu = async (): Promise<TOption[]> =>{
+        const response = await menuApi.getOptions();
+        return response.data;
+    }
+
     const fetchData = async () => {
 
         try {
 
             const [
-                menu
+                menu, optionsMenu
             ] = await Promise.all([
-                getMenu()
+                getMenu(), getOptionsMenu()
             ]);
 
             dispatch(setMenu( menu ) );
+            dispatch(setOptionsMenu( optionsMenu ) );
 
         } catch (error) {
 

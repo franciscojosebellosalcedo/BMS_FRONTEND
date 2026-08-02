@@ -9,6 +9,7 @@ type Props = {
 
 const getIcon = (typeIcon: TTypeIcon, fs?: number, me?: number ) =>{
     const typesIcons = {
+        "edit": <i className={`bi bi-pencil   ${me ? `me-${me}` : "" } ${fs ? `fs-${fs}` : ""} `}></i>,
         "add": <i className={`bi bi-plus-lg    ${me ? `me-${me}` : "" } ${fs ? `fs-${fs}` : ""} `}></i>,
         "disable-enable": <i className={`bi bi-toggle-on    ${me ? `me-${me}` : "" } ${fs ? `fs-${fs}` : ""} `}></i>,
     }

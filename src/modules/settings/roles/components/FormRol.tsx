@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import rolApi from "../api/rolApi";
 import type { TResponseHttp } from "../../../../shared/types/responseType";
 import Loading from "../../../../shared/components/Loader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ROUTES } from "../../../../app/utils/menu/appRoutes";
 import { useAntiSpam } from "../../../../shared/hooks/useAntiSpam";
 import { addRol } from "../../../../features/rol/rolSlice";
@@ -48,6 +48,12 @@ const FormRol = () => {
     const dispatch = useAppDispatch();
 
     const [permissions, setPermissions] = useState<TRolPermission[]>([]);
+
+    const params = useParams();
+
+    const [isLoadingGetRol, setIsLoadingGetRol] = useState(false);
+
+    const [rolFound, setRolFound] = useState<TDataRol | null>(null);
 
     const handlePermissionRol = ({
         optionId,
@@ -153,6 +159,38 @@ const FormRol = () => {
         formik.submitForm();
     }
 
+    const getRolById = async (idRol: number) => {
+        try {
+
+            setIsLoadingGetRol(true);
+
+            const responseHttp: TResponseHttp<TDataRol> = await rolApi.getRolById(idRol);
+
+            const data = responseHttp.data;
+
+            formik.setValues({...data.rol})
+
+            setPermissions( data.permissions );
+
+            setRolFound(data);
+
+        } catch (error: any) {
+
+            const code = error?.response?.data?.code;
+
+            const menssage = getMessageResponse(code);
+
+            toast.error(menssage);
+
+            navigate( ROUTES.SETTING_ROLS );
+
+        } finally {
+
+            setIsLoadingGetRol(false);
+
+        }
+    }
+
     const createRol = async (values: TRol) => {
 
         try {
@@ -204,31 +242,47 @@ const FormRol = () => {
     }
 
     useEffect(() => {
-        dispatch(setComponent(
-            <div className="d-flex justify-content-end">
-                <Button
-                    disabled={isLoading}
-                    className="btn btn-sm btn-secondary me-2"
-                    type="button"
-                    onClick={navigateToBack}
-                >
-                    Cancelar
-                </Button>
 
-                <Button
-                    onClick={sendForm}
-                    disabled={isLoading}
-                    className="btn btn-sm btn-primary"
-                    type="button">
+        if (!params.id) return;
 
-                    {
-                        isLoading ? <Loading /> : "Guardar"
-                    }
-                </Button>
-            </div>
-        ));
+        getRolById(Number(params.id));
 
-    }, [isLoading, permissions]);
+    }, [params.id]);
+
+    useEffect(() => {
+
+        if (!isLoadingGetRol) {
+
+            dispatch(setComponent(
+                <div className="d-flex justify-content-end">
+                    <Button
+                        disabled={isLoading}
+                        className="btn btn-sm btn-secondary me-2"
+                        type="button"
+                        onClick={navigateToBack}
+                    >
+                        Cancelar
+                    </Button>
+
+                    <Button
+                        onClick={sendForm}
+                        disabled={isLoading}
+                        className="btn btn-sm btn-primary"
+                        type="button">
+
+                        {
+                            isLoading ? <Loading /> : "Guardar"
+                        }
+                    </Button>
+                </div>
+            ));
+        }
+
+        return () => {
+            dispatch(setComponent(null));
+        };
+
+    }, [isLoading, permissions, params.id, isLoadingGetRol]);
 
     useEffect(() => {
 
@@ -240,115 +294,120 @@ const FormRol = () => {
 
         }
 
-    }, [isLoading, permissions ]);
+    }, [isLoading, permissions]);
 
     return (
         <section>
 
-            <TitleContent title="Nuevo rol" />
+            <TitleContent title={params.id ? "Editar rol" : "Nuevo rol"} />
 
             <Separator />
 
-            <>
-                <div className='row mb-2'>
-                    <div className='col-12 col-sm-6 mb-1 mt-1'>
-                        <InputGroup size='sm' className='mb-3'>
-                            <InputGroup.Text id='inputGroup-sizing-default'>Nombre</InputGroup.Text>
-                            <Form.Control
-                                autoFocus
-                                onChange={(e) => {
+            {
+                isLoadingGetRol ? <Loading /> :
+                    <>
+                        <>
+                            <div className='row mb-2'>
+                                <div className='col-12 col-sm-6 mb-1 mt-1'>
+                                    <InputGroup size='sm' className='mb-3'>
+                                        <InputGroup.Text id='inputGroup-sizing-default'>Nombre</InputGroup.Text>
+                                        <Form.Control
+                                            autoFocus
+                                            onChange={(e) => {
 
-                                    const value = e.target.value.trim();
-                                    formik.setFieldValue("rol_Nombre", value);
+                                                const value = e.target.value.trim();
+                                                formik.setFieldValue("rol_Nombre", value);
 
-                                }}
-                                placeholder='Nombre del rol'
-                                name='rol_Nombre'
-                                type='text'
-                                className={clsx(
-                                    'form-control',
-                                    {
-                                        'is-invalid': formik.touched.rol_Nombre && formik.errors.rol_Nombre,
-                                    },
-                                    {
-                                        'is-valid': formik.touched.rol_Nombre && !formik.errors.rol_Nombre,
-                                    }
-                                )}
-                            />
-                        </InputGroup>
-                        {formik.touched.rol_Nombre && formik.errors.rol_Nombre && (
-                            <TextError message={formik.errors.rol_Nombre} typeAlert="danger" />
-                        )}
-                    </div>
+                                            }}
+                                            placeholder='Nombre del rol'
+                                            name='rol_Nombre'
+                                            value={formik.values.rol_Nombre}
+                                            type='text'
+                                            className={clsx(
+                                                'form-control',
+                                                {
+                                                    'is-invalid': formik.touched.rol_Nombre && formik.errors.rol_Nombre,
+                                                },
+                                                {
+                                                    'is-valid': formik.touched.rol_Nombre && !formik.errors.rol_Nombre,
+                                                }
+                                            )}
+                                        />
+                                    </InputGroup>
+                                    {formik.touched.rol_Nombre && formik.errors.rol_Nombre && (
+                                        <TextError message={formik.errors.rol_Nombre} typeAlert="danger" />
+                                    )}
+                                </div>
 
-                    <div className='col mb-1 mt-1'>
-                        <InputGroup size='sm' className='mb-3'>
-                            <InputGroup.Text id='inputGroup-sizing-default'>
-                                Descripción (Opcional)
-                            </InputGroup.Text>
-                            <Form.Control
-                                aria-label='Default'
-                                aria-describedby='inputGroup-sizing-default'
-                                onChange={(e) => {
+                                <div className='col mb-1 mt-1'>
+                                    <InputGroup size='sm' className='mb-3'>
+                                        <InputGroup.Text id='inputGroup-sizing-default'>
+                                            Descripción (Opcional)
+                                        </InputGroup.Text>
+                                        <Form.Control
+                                            onChange={(e) => {
 
-                                    const value = e.target.value.trim();
-                                    formik.setFieldValue("rol_Descripcion", value);
+                                                const value = e.target.value.trim();
+                                                formik.setFieldValue("rol_Descripcion", value);
 
-                                }}
-                                placeholder='Descripción del rol'
-                                name='rol_Descripcion'
-                                type='text'
-                                className={clsx(
-                                    'form-control',
-                                    {
-                                        'is-invalid':
-                                            formik.touched.rol_Descripcion && formik.errors.rol_Descripcion,
-                                    },
-                                    {
-                                        'is-valid':
-                                            formik.touched.rol_Descripcion && !formik.errors.rol_Descripcion,
-                                    }
-                                )}
-                            />
-                        </InputGroup>
-                        {formik.touched.rol_Descripcion && formik.errors.rol_Descripcion && (
-                            <TextError message={formik.errors.rol_Descripcion} typeAlert="danger" />
-                        )}
-                    </div>
-                </div>
+                                            }}
+                                            placeholder='Descripción del rol'
+                                            value={formik.values.rol_Descripcion}
+                                            name='rol_Descripcion'
+                                            type='text'
+                                            className={clsx(
+                                                'form-control',
+                                                {
+                                                    'is-invalid':
+                                                        formik.touched.rol_Descripcion && formik.errors.rol_Descripcion,
+                                                },
+                                                {
+                                                    'is-valid':
+                                                        formik.touched.rol_Descripcion && !formik.errors.rol_Descripcion,
+                                                }
+                                            )}
+                                        />
+                                    </InputGroup>
+                                    {formik.touched.rol_Descripcion && formik.errors.rol_Descripcion && (
+                                        <TextError message={formik.errors.rol_Descripcion} typeAlert="danger" />
+                                    )}
+                                </div>
+                            </div>
 
-            </>
+                        </>
 
-            <TitleContent title="Permisos" />
+                        <TitleContent title="Permisos" />
 
-            <Separator />
+                        <Separator />
 
-            <Permissions
-                permissionsRol={permissions}
-                handlerPermissionRol={handlePermissionRol}
-            />
+                        <Permissions
+                            permissionsRol={permissions}
+                            handlerPermissionRol={handlePermissionRol}
+                        />
 
-            <div className="d-flex justify-content-end mt-2">
-                <Button
-                    disabled={isLoading}
-                    className="btn btn-sm btn-secondary me-2"
-                    type="button"
-                    onClick={navigateToBack}
-                >
-                    Cancelar
-                </Button>
+                        <div className="d-flex justify-content-end mt-2">
+                            <Button
+                                disabled={isLoading}
+                                className="btn btn-sm btn-secondary me-2"
+                                type="button"
+                                onClick={navigateToBack}
+                            >
+                                Cancelar
+                            </Button>
 
-                <Button
-                    onClick={sendForm}
-                    disabled={isLoading}
-                    className="btn btn-sm btn-primary"
-                    type="button">
+                            <Button
+                                onClick={sendForm}
+                                disabled={isLoading}
+                                className="btn btn-sm btn-primary"
+                                type="button">
 
-                    {
-                        isLoading ? <Loading /> : "Guardar"
-                    }
-                </Button>
-            </div>
+                                {
+                                    isLoading ? <Loading /> : "Guardar"
+                                }
+                            </Button>
+                        </div>
+                    </>
+            }
 
         </section>
     )
