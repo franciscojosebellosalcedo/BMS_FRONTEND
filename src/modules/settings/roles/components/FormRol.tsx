@@ -53,7 +53,7 @@ const FormRol = () => {
 
     const [isLoadingGetRol, setIsLoadingGetRol] = useState(false);
 
-    const [rolFound, setRolFound] = useState<TDataRol | null>(null);
+    const [_, setRolFound] = useState<TDataRol | null>(null);
 
     const handlePermissionRol = ({
         optionId,
