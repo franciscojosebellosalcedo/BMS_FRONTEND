@@ -32,20 +32,13 @@ jobs:
           cd ~/projects/bms/BMS_FRONTEND &&
           git pull origin main
           "
-
-      - name: Verificar usuario
+      - name: Desplegar
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.TAILSCALE_IP }} "
-            whoami
-            sudo -n -l
+          ssh ${{secrets.SERVER_USER}}@${{secrets.TAILSCALE_IP}} "
+          cd ~/projects/bms/BMS_FRONTEND &&
+          npm install &&
+          npm run build &&
+          sudo -n rm -rf /var/www/BMS_FRONTEND/* &&
+          sudo -n cp -r dist/* /var/www/BMS_FRONTEND/ &&
+          sudo systemctl reload nginx
           "
-      # - name: Desplegar
-      #   run: |
-      #     ssh ${{secrets.SERVER_USER}}@${{secrets.TAILSCALE_IP}} "
-      #     cd ~/projects/bms/BMS_FRONTEND &&
-      #     npm install &&
-      #     npm run build &&
-      #     sudo rm -rf /var/www/BMS_FRONTEND/* &&
-      #     sudo cp -r ~/projects/bms/BMS_FRONTEND/dist/* /var/www/BMS_FRONTEND/ &&
-      #     sudo systemctl reload nginx
-      #     "
