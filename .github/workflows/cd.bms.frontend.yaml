@@ -2,7 +2,7 @@ name: CD BMS FRONTEND
 
 on: 
   push:
-    branchs:
+    branches:
       - main
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
       - name: Conecntar con Tailscale
         uses: tailscale/github-action@v3
         with:
-          authKey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
       
       - name: Crear carpeta ssh
         run: mkdir -p ~/.ssh
