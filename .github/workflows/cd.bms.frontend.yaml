@@ -39,6 +39,5 @@ jobs:
           npm install &&
           npm run build &&
           sudo -n rm -rf /var/www/BMS_FRONTEND/* &&
-          sudo -n cp -r dist/* /var/www/BMS_FRONTEND/ &&
-          sudo systemctl reload nginx
+          sudo -n cp -r dist/* /var/www/BMS_FRONTEND/
           "
