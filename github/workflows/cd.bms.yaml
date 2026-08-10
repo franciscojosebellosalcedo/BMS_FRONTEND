@@ -1,0 +1,47 @@
+name: CD BMS FRONTEND
+
+on: 
+  push:
+    branchs:
+      - main
+
+jobs:
+
+  cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      - name: Conecntar con Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          authKey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+      
+      - name: Crear carpeta ssh
+        run: mkdir -p ~/.ssh
+      
+      - name: Agregar llave privada
+        run: echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_ed25519
+
+      - name: Configurar permisos
+        run: chmod 600 ~/.ssh/id_ed25519
+      
+      - name: Agregar servidor a known_hosts
+        run: ssh-keyscan ${{secrets.TAILSCALE_IP}} >> ~/.ssh/known_hosts
+
+      - name: Actualizar proyecto
+        run: |
+          ssh ${{secrets.SERVER_USER}}@${{secrets.TAILSCALE_IP}} "
+          cd ~/projects/bms/BMS_FRONTEND &&
+          git pull origin main
+          "
+      - name: Desplegar
+        run: |
+          ssh ${{secrets.SERVER_USER}}@${{secrets.TAILSCALE_IP}} "
+          cd ~/projects/bms/BMS_FRONTEND &&
+          npm install &&
+          npm run build &&
+          sudo rm -rf /var/www/BMS_FRONTEND/* &&
+          sudo cp -r ~/projects/bms/BMS_FRONTEND/dist/* /var/www/BMS_FRONTEND/ &&
+          sudo systemctl reload nginx
+          "
