@@ -315,7 +315,7 @@ const FormRol = () => {
                                             autoFocus
                                             onChange={(e) => {
 
-                                                const value = e.target.value.trim();
+                                                const value = e.target.value;
                                                 formik.setFieldValue("rol_Nombre", value);
 
                                             }}
@@ -347,7 +347,7 @@ const FormRol = () => {
                                         <Form.Control
                                             onChange={(e) => {
 
-                                                const value = e.target.value.trim();
+                                                const value = e.target.value;
                                                 formik.setFieldValue("rol_Descripcion", value);
 
                                             }}
